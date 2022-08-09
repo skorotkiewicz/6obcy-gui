@@ -1,0 +1,32 @@
+.label_settings {
+  border: 1px solid #ccc;
+  background-color: rgb(240, 240, 240);
+  border-radius: 0.5vh;
+  padding: 3px;
+  margin-left: 5px;
+  cursor: pointer;
+}
+.settings-list-item {
+  padding: 10px;
+}
+.infos {
+  padding: 10px;
+  font-size: x-large;
+  text-align: center;
+  color: tomato;
+}
+.connected {
+  padding: 10px;
+  font-size: x-large;
+  text-align: center;
+  color: springgreen;
+}
+.beta {
+  margin: 30px;
+  color: steelblue;
+}
+
+button:disabled,
+button[disabled] {
+  background-color: rgb(133, 133, 133);
+}

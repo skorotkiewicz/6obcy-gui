@@ -1,0 +1,147 @@
+* {
+  -webkit-appearance: none;
+}
+
+.messenger {
+  display: grid;
+  width: 100%;
+  height: 100vh;
+  background: #eeeef1;
+  grid-template-columns: 350px auto;
+  grid-template-rows: 60px auto 60px;
+  grid-column-gap: 1px;
+  grid-row-gap: 1px;
+}
+
+.content,
+.sidebar {
+  background: #fff;
+  grid-row-start: 1;
+  grid-row-end: span 3;
+}
+.scrollable {
+  position: relative;
+  overflow-y: scroll;
+  -webkit-overflow-scrolling: touch;
+}
+
+.toolbar {
+  display: flex;
+  align-items: center;
+  background-color: #fff;
+  font-weight: 500;
+  border-bottom: 1px solid #eeeef1;
+  position: -webkit-sticky;
+  position: sticky;
+  top: 0;
+}
+
+.left-items,
+.right-items {
+  flex: 1 1;
+  padding: 10px;
+  display: flex;
+}
+
+.toolbar-title {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 800;
+}
+
+.right-items {
+  flex-direction: row-reverse;
+}
+.left-items,
+.right-items {
+  flex: 1 1;
+  padding: 10px;
+  display: flex;
+}
+
+.message-list-container {
+  padding: 10px 10px 70px;
+}
+
+.message {
+  display: flex;
+  flex-direction: column;
+}
+
+.message.mine .bubble-container {
+  justify-content: flex-end;
+}
+.message .bubble-container {
+  font-size: 14px;
+  display: flex;
+}
+
+.message.mine.end .bubble-container .bubble {
+  border-bottom-right-radius: 20px;
+  margin-bottom: 10px;
+}
+.message.mine.start .bubble-container .bubble {
+  margin-top: 10px;
+  border-top-right-radius: 20px;
+}
+.message.mine .bubble-container .bubble {
+  background: #007aff;
+  color: #fff;
+  border-top-left-radius: 20px;
+  border-bottom-left-radius: 20px;
+  border-top-right-radius: 2px;
+  border-bottom-right-radius: 2px;
+}
+
+.message.start .bubble-container .bubble {
+  border-top-left-radius: 20px;
+}
+.message .bubble-container .bubble {
+  margin: 1px 0;
+  background: #f4f4f8;
+  padding: 10px 15px;
+  border-radius: 20px;
+  max-width: 75%;
+  border-top-left-radius: 2px;
+  border-bottom-left-radius: 2px;
+  border-top-right-radius: 20px;
+  border-bottom-right-radius: 20px;
+}
+
+.message.end .bubble-container .bubble {
+  border-bottom-left-radius: 20px;
+}
+.message .bubble-container .bubble {
+  margin: 1px 0;
+  background: #f4f4f8;
+  padding: 10px 15px;
+  border-radius: 20px;
+  max-width: 75%;
+  border-top-left-radius: 2px;
+  border-bottom-left-radius: 2px;
+  border-top-right-radius: 20px;
+  border-bottom-right-radius: 20px;
+}
+
+.compose {
+  padding: 10px;
+  display: flex;
+  align-items: center;
+  background: #fff;
+  border-top: 1px solid #eeeef1;
+  position: fixed;
+  width: calc(100% - 20px);
+  bottom: 0;
+}
+
+.compose-input {
+  flex: 1 1;
+  border: none;
+  font-size: 14px;
+  height: 40px;
+  background: none;
+}
+.question {
+  background-color: rgb(255, 190, 190);
+  padding: 5px;
+}
