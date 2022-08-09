@@ -294,144 +294,47 @@ function Chat() {
   };
 
   return (
-    <>
-      <div className="Chat">
-        <header>
-          <span>6obcy Desktop App</span>
-          <span>{connected ? 'Połączono' : '.'}</span>
-          {count ? <span>{count} osób online</span> : <span>łączenie...</span>}
-        </header>
+    <div className="Chat">
+      <header>
+        <span>6obcy Desktop App</span>
+        <span>{connected && 'Połączono'}</span>
+        {count ? <span>{count} osób online</span> : <span>łączenie...</span>}
+      </header>
 
-        <main>
-          <aside>
-            <button onClick={startConversation} disabled={connected}>
-              Połącz
-            </button>
-            <button onClick={sendDisconnect} disabled={!connected}>
-              {confirmDisconnect ? 'Czy na pewno?' : 'Rozłącz'}
-            </button>
-            <button onClick={sendRandTopic} disabled={!connected}>
-              {topicCountdown !== 0
-                ? `Zaczekaj ${topicCountdown} sekund`
-                : 'Losowe pytanie'}
-            </button>
-            <button
-              onClick={() => setReconnect((prev) => !prev)}
-              disabled={!connected}
-            >
-              Auto łączenie {reconnect ? 'ON' : 'OFF'}
-            </button>
-            <div className="autoWelcome">
-              <span>Auto wiadomość powitalna</span>
-              <input
-                type="text"
-                placeholder="Treść auto wiadomości"
-                onChange={(e) => setWelcomeMessage(e.target.value)}
-              />
-            </div>
-
-            <div className={connected ? 'connected' : 'infos'}>
-              <strong>{info}</strong>
-            </div>
-          </aside>
-          <div>
-            <div className="messages">
-              {captcha.length > 0 && (
-                <div>
-                  <p>Captcha</p>
-                  <p>
-                    <img src={captcha} alt="captcha" />
-                  </p>
-
-                  <p>
-                    <input
-                      type="text"
-                      onChange={(e) => setCaptchaText(e.target.value)}
-                    />
-                  </p>
-
-                  <p>
-                    <button onClick={() => SolveCaptcha(captchaText)}>
-                      Zatwierdź
-                    </button>
-                  </p>
-                </div>
-              )}
-
-              <ChatMessages messages={messages} />
-            </div>
-            {typing && <span>Opcy pisze...</span>}
-            <footer>
-              <form onSubmit={sendForm}>
-                <input
-                  type="text"
-                  disabled={!connected}
-                  value={userMessage}
-                  placeholder="Twoja wiadomość..."
-                  onChange={(e) => textinput(e.target.value)}
-                />
-              </form>
-            </footer>
+      <main>
+        <aside>
+          <button onClick={startConversation} disabled={connected}>
+            Połącz
+          </button>
+          <button onClick={sendDisconnect} disabled={!connected}>
+            {confirmDisconnect ? 'Czy na pewno?' : 'Rozłącz'}
+          </button>
+          <button onClick={sendRandTopic} disabled={!connected}>
+            {topicCountdown !== 0
+              ? `Zaczekaj ${topicCountdown} sekund`
+              : 'Losowe pytanie'}
+          </button>
+          <button
+            onClick={() => setReconnect((prev) => !prev)}
+            disabled={!connected}
+          >
+            Auto łączenie {reconnect ? 'ON' : 'OFF'}
+          </button>
+          <div className="autoWelcome">
+            <span>Auto wiadomość powitalna</span>
+            <input
+              type="text"
+              placeholder="Treść auto wiadomości"
+              onChange={(e) => setWelcomeMessage(e.target.value)}
+            />
           </div>
-        </main>
-      </div>
 
-      {/* <div className="messenger">
-        <div className="scrollable sidebar">
-          <div className="settings-list">
-            <div className="toolbar">
-              <div className="left-items">
-                <i className="toolbar-button ion-ios-cog"></i>
-              </div>
-              <h1 className="toolbar-title">6obcy</h1>
-              <div className="right-items">
-                online <strong> {count}</strong>
-              </div>
-            </div>
-
-            <div className="settings-list-item">
-              <div className="settings-info">
-                <h2>Akcje</h2>
-                <button onClick={startConversation} disabled={connected}>
-                  Połącz
-                </button>
-                <button onClick={sendDisconnect} disabled={!connected}>
-                  Rozłącz
-                </button>
-                <button onClick={sendRandTopic} disabled={!connected}>
-                  Losowe pytanie
-                </button>
-                <button
-                  onClick={() => setReconnect((prev) => !prev)}
-                  disabled={!connected}
-                >
-                  Auto łączenie {reconnect ? 'ON' : 'OFF'}
-                </button>
-
-                <div>
-                  <h3>Auto wiadomość powitalna</h3>
-                  <input
-                    type="text"
-                    placeholder="Auto wiadomość powitalna"
-                    onChange={(e) => setWelcomeMessage(e.target.value)}
-                  />
-                </div>
-
-                <div className={connected ? 'connected' : 'infos'}>
-                  <strong>{info}</strong>
-                </div>
-              </div>
-            </div>
+          <div className={connected ? 'connected' : 'infos'}>
+            <strong>{info}</strong>
           </div>
-        </div>
-        <div className="scrollable content">
-          <div className="message-list">
-            <div className="toolbar">
-              <div className="left-items"></div>
-              <h1 className="toolbar-title">Rozmowa</h1>
-              <div className="right-items">{connected ? 'Połączono' : '.'}</div>
-            </div>
-
+        </aside>
+        <div>
+          <div className="messages">
             {captcha.length > 0 && (
               <div>
                 <p>Captcha</p>
@@ -454,21 +357,23 @@ function Chat() {
               </div>
             )}
 
-            <ChatMessages messages={messages} typing={typing} />
-            <ChatInput
-              connected={connected}
-              sendForm={sendForm}
-              userMessage={userMessage}
-              setUserMessage={setUserMessage}
-              startConversation={startConversation}
-              sendDisconnect={sendDisconnect}
-              sendRandTopic={sendRandTopic}
-              textinput={textinput}
-            />
+            <ChatMessages messages={messages} />
           </div>
+          {typing && <span>Opcy pisze...</span>}
+          <footer>
+            <form onSubmit={sendForm}>
+              <input
+                type="text"
+                disabled={!connected}
+                value={userMessage}
+                placeholder="Twoja wiadomość..."
+                onChange={(e) => textinput(e.target.value)}
+              />
+            </form>
+          </footer>
         </div>
-      </div> */}
-    </>
+      </main>
+    </div>
   );
 }
 
