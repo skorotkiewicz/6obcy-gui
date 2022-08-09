@@ -17,7 +17,13 @@ function main() {
   wss.on('connection', function connection(wss) {
     const ws = new WebSocket(
       'wss://server.6obcy.pl:7001/6eio/?EIO=3&transport=websocket',
-      { origin: 'https://6obcy.org' }
+      {
+        headers: {
+          'User-Agent':
+            'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0) Gecko/20100101 Firefox/102.0',
+        },
+        origin: 'https://6obcy.org',
+      }
     );
 
     ws.on('message', function incoming(data) {
@@ -77,7 +83,7 @@ export default class MenuBuilder {
 
       Menu.buildFromTemplate([
         {
-          label: 'Inspect element',
+          label: 'Zbadaj',
           click: () => {
             this.mainWindow.webContents.inspectElement(x, y);
           },
@@ -88,29 +94,26 @@ export default class MenuBuilder {
 
   buildDarwinTemplate(): MenuItemConstructorOptions[] {
     const subMenuAbout: DarwinMenuItemConstructorOptions = {
-      label: 'Electron',
+      label: '6obcy Desktop App',
       submenu: [
         {
-          label: 'About ElectronReact',
+          label: 'O 6obcy Desktop App',
           selector: 'orderFrontStandardAboutPanel:',
         },
         { type: 'separator' },
-        { label: 'Services', submenu: [] },
         { type: 'separator' },
         {
-          label: 'Hide ElectronReact',
+          label: 'Ukryj 6obcy App',
           accelerator: 'Command+H',
           selector: 'hide:',
         },
         {
-          label: 'Hide Others',
-          accelerator: 'Command+Shift+H',
-          selector: 'hideOtherApplications:',
+          label: 'Wyświetl wszystkie Apps',
+          selector: 'unhideAllApplications:',
         },
-        { label: 'Show All', selector: 'unhideAllApplications:' },
         { type: 'separator' },
         {
-          label: 'Quit',
+          label: 'Wyjdź',
           accelerator: 'Command+Q',
           click: () => {
             app.quit();
@@ -172,19 +175,6 @@ export default class MenuBuilder {
         },
       ],
     };
-    const subMenuWindow: DarwinMenuItemConstructorOptions = {
-      label: 'Window',
-      submenu: [
-        {
-          label: 'Minimize',
-          accelerator: 'Command+M',
-          selector: 'performMiniaturize:',
-        },
-        { label: 'Close', accelerator: 'Command+W', selector: 'performClose:' },
-        { type: 'separator' },
-        { label: 'Bring All to Front', selector: 'arrangeInFront:' },
-      ],
-    };
 
     const subMenuView =
       process.env.NODE_ENV === 'development' ||
@@ -192,7 +182,7 @@ export default class MenuBuilder {
         ? subMenuViewDev
         : subMenuViewProd;
 
-    return [subMenuAbout, subMenuEdit, subMenuView, subMenuWindow];
+    return [subMenuAbout, subMenuEdit, subMenuView];
   }
 
   buildDefaultTemplate() {

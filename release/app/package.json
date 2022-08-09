@@ -3,6 +3,11 @@
   "version": "0.0.2",
   "description": "6obcy Client for Desktop",
   "license": "MIT",
+  "author": {
+    "name": "Sebastian Korotkiewicz",
+    "email": "skorotkiewicz@gmail.com",
+    "url": "https://github.com/skorotkiewicz"
+  },
   "main": "./dist/main/main.js",
   "scripts": {
     "electron-rebuild": "node -r ts-node/register ../../.erb/scripts/electron-rebuild.js",
