@@ -1,7 +1,6 @@
 import { useEffect, useState, useRef } from 'react';
 import { MemoryRouter as Router, Routes, Route } from 'react-router-dom';
 import ChatMessages from './components/ChatMessages';
-import ChatInput from './components/ChatInput';
 import useWebSocket from 'react-use-websocket';
 import './App.scss';
 
@@ -19,7 +18,11 @@ function Chat() {
   const [welcomeMessage, setWelcomeMessage] = useState<string>('');
   const [isSolved, setIsSolved] = useState<boolean>(false);
   const [reconnect, setReconnect] = useState<boolean>(false);
+  const [confirmDisconnect, setConfirmDisconnect] = useState<boolean>(false);
+  const [topicCountdown, setTopicCountdown] = useState<number>(0);
   const didUnmount = useRef<boolean>(false);
+  const countdown = useRef<any>(null);
+  let tcountdown = 0;
 
   const { sendMessage } = useWebSocket('ws://localhost:4444', {
     onOpen: () => {
@@ -76,8 +79,6 @@ function Chat() {
     });
     setInfo('Szukam rozmówcy...');
     setMessages([]);
-
-    welcomeMessage && sendUserMessage(welcomeMessage);
   };
 
   const _emitSocketEvent = (eventName: any, eventData: any) => {
@@ -174,6 +175,8 @@ function Chat() {
     setCkey(msgData.ev_data.ckey);
     setInfo('Połączono z obcym...');
     setConnected(true);
+
+    welcomeMessage && sendUserMessage(welcomeMessage);
   };
 
   const _handleStrangerMessage = (msgData: any) => {
@@ -188,6 +191,10 @@ function Chat() {
     setInfo('Rozmowa zakończona...');
     setTyp('');
     setConnected(false);
+
+    setTopicCountdown(0);
+    tcountdown = 0;
+    clearInterval(countdown.current);
   };
 
   const _handleCount = (c: any) => {
@@ -199,17 +206,39 @@ function Chat() {
   };
 
   const sendRandTopic = () => {
-    _emitSocketEvent('_randtopic', {
-      ckey: ckey,
-    });
+    if (topicCountdown === 0) {
+      setTopicCountdown(60);
+      tcountdown = 60;
+
+      countdown.current = setInterval(() => {
+        if (tcountdown !== 0) {
+          setTopicCountdown((prev) => prev - 1);
+          tcountdown = tcountdown - 1;
+        } else {
+          clearInterval(countdown.current);
+        }
+      }, 1000);
+
+      _emitSocketEvent('_randtopic', {
+        ckey: ckey,
+      });
+    }
   };
 
   const sendDisconnect = () => {
-    _emitSocketEvent('_distalk', {
-      ckey: ckey,
-    });
-    setCkey('');
-    setConnected(false);
+    if (confirmDisconnect) {
+      _emitSocketEvent('_distalk', {
+        ckey: ckey,
+      });
+      setCkey('');
+      setConnected(false);
+    } else {
+      setConfirmDisconnect(true);
+
+      setTimeout(() => {
+        setConfirmDisconnect(false);
+      }, 1000);
+    }
   };
 
   const sendUserMessage = (msg: any) => {
@@ -264,7 +293,88 @@ function Chat() {
 
   return (
     <>
-      <div className="messenger">
+      <div className="Chat">
+        <header>
+          <span>6obcy Desktop App</span>
+          <span>{connected ? 'Połączono' : '.'}</span>
+          {count ? <span>{count} osób online</span> : <span>łączenie...</span>}
+        </header>
+
+        <main>
+          <aside>
+            <button onClick={startConversation} disabled={connected}>
+              Połącz
+            </button>
+            <button onClick={sendDisconnect} disabled={!connected}>
+              {confirmDisconnect ? 'Czy na pewno?' : 'Rozłącz'}
+            </button>
+            <button onClick={sendRandTopic} disabled={!connected}>
+              {topicCountdown !== 0
+                ? `Zaczekaj ${topicCountdown} sekund`
+                : 'Losowe pytanie'}
+            </button>
+            <button
+              onClick={() => setReconnect((prev) => !prev)}
+              disabled={!connected}
+            >
+              Auto łączenie {reconnect ? 'ON' : 'OFF'}
+            </button>
+            <div className="autoWelcome">
+              <span>Auto wiadomość powitalna</span>
+              <input
+                type="text"
+                placeholder="Treść auto wiadomości"
+                onChange={(e) => setWelcomeMessage(e.target.value)}
+              />
+            </div>
+
+            <div className={connected ? 'connected' : 'infos'}>
+              <strong>{info}</strong>
+            </div>
+          </aside>
+          <div>
+            <div className="messages">
+              {captcha.length > 0 && (
+                <div>
+                  <p>Captcha</p>
+                  <p>
+                    <img src={captcha} alt="captcha" />
+                  </p>
+
+                  <p>
+                    <input
+                      type="text"
+                      onChange={(e) => setCaptchaText(e.target.value)}
+                    />
+                  </p>
+
+                  <p>
+                    <button onClick={() => SolveCaptcha(captchaText)}>
+                      Zatwierdź
+                    </button>
+                  </p>
+                </div>
+              )}
+
+              <ChatMessages messages={messages} />
+            </div>
+            {typing && <span>Opcy pisze...</span>}
+            <footer>
+              <form onSubmit={sendForm}>
+                <input
+                  type="text"
+                  disabled={!connected}
+                  value={userMessage}
+                  placeholder="Twoja wiadomość..."
+                  onChange={(e) => textinput(e.target.value)}
+                />
+              </form>
+            </footer>
+          </div>
+        </main>
+      </div>
+
+      {/* <div className="messenger">
         <div className="scrollable sidebar">
           <div className="settings-list">
             <div className="toolbar">
@@ -355,7 +465,7 @@ function Chat() {
             />
           </div>
         </div>
-      </div>
+      </div> */}
     </>
   );
 }

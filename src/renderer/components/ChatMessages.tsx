@@ -1,7 +1,6 @@
 import { useEffect, useRef } from 'react';
-import './ChatMessages.scss';
 
-const ChatMessages = ({ messages, typing }: any) => {
+const ChatMessages = ({ messages }: any) => {
   const divRef = useRef<null | HTMLDivElement>(null);
 
   useEffect(() => {
@@ -9,35 +8,20 @@ const ChatMessages = ({ messages, typing }: any) => {
   });
 
   return (
-    <div className="screen">
-      <div className="message-list-container">
-        {messages.map((data: any, key: any) => (
-          <Message key={key} msg={data.msg} who={data.who} />
-        ))}
-        <strong>{typing}</strong>
-      </div>
-
-      <div ref={divRef}></div>
-    </div>
-  );
-};
-
-const Message = ({ who, msg }: any) => {
-  var cl = '';
-  if (who === 1) {
-    cl = 'mine';
-  } else if (who === 2) {
-    cl = 'question';
-  } else {
-    cl = '';
-  }
-
-  return (
-    <div className={'message start end ' + cl}>
-      {/* <div className="timestamp">{who}</div> */}
-      <div className="bubble-container">
-        <div className="bubble">{msg}</div>
-      </div>
+    <div>
+      {messages.map((data: any, key: number) => (
+        <span key={key}>
+          <strong style={{ color: data.who === 1 ? 'blue' : 'green' }}>
+            {data.who === 1 ? 'Ja: ' : data.who === 2 ? '' : 'Obcy: '}
+          </strong>
+          {data.who === 2 ? (
+            <span style={{ color: 'red' }}>{data.msg}</span>
+          ) : (
+            data.msg
+          )}
+          <div ref={divRef}></div>
+        </span>
+      ))}
     </div>
   );
 };
