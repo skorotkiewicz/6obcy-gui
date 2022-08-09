@@ -1,15 +1,30 @@
 import {
   app,
   Menu,
-  shell,
   BrowserWindow,
   MenuItemConstructorOptions,
+  ipcMain,
 } from 'electron';
-
 import http from 'http';
 import WebSocket from 'ws';
+import SocksProxyAgent from 'socks-proxy-agent';
+import Store from 'electron-store';
+const store = new Store();
 
-function main() {
+if (!store.get('proxy')) {
+  main(null, false);
+}
+
+ipcMain.on('proxy', async (_event, arg) => {
+  if (arg === null) {
+    main(null, false);
+  } else {
+    let agent = new SocksProxyAgent('socks://' + arg);
+    main(arg, agent);
+  }
+});
+
+function main(arg: string | null, agent: any) {
   const server = http.createServer();
   const wss = new WebSocket.Server({ server });
   server.listen(4444);
@@ -18,6 +33,7 @@ function main() {
     const ws = new WebSocket(
       'wss://server.6obcy.pl:7001/6eio/?EIO=3&transport=websocket',
       {
+        agent: arg ? agent : false,
         headers: {
           'User-Agent':
             'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0) Gecko/20100101 Firefox/102.0',
@@ -43,8 +59,6 @@ function main() {
     // });
   });
 }
-
-main();
 
 interface DarwinMenuItemConstructorOptions extends MenuItemConstructorOptions {
   selector?: string;

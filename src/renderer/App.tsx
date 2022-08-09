@@ -4,6 +4,18 @@ import ChatMessages from './components/ChatMessages';
 import useWebSocket from 'react-use-websocket';
 import './App.scss';
 
+declare global {
+  interface Window {
+    electron: {
+      ipcRenderer: any;
+      store: {
+        get: (key: string) => any;
+        set: (key: string, val: any) => void;
+      };
+    };
+  }
+}
+
 function Chat() {
   const [ckey, setCkey] = useState<string>('');
   const [messages, setMessages] = useState<object[]>([]);
@@ -20,16 +32,20 @@ function Chat() {
   const [reconnect, setReconnect] = useState<boolean>(false);
   const [confirmDisconnect, setConfirmDisconnect] = useState<boolean>(false);
   const [topicCountdown, setTopicCountdown] = useState<number>(0);
+  const [connectStatus, setConnectStatus] = useState<number>(0);
+  const [proxy, setProxy] = useState<any>('');
+  const [proxyState, setProxyState] = useState<number>(0);
   const didUnmount = useRef<boolean>(false);
   const countdown = useRef<any>(null);
   let tcountdown = 0;
 
-  const { sendMessage } = useWebSocket('ws://localhost:4444', {
+  const { sendMessage, readyState } = useWebSocket('ws://localhost:4444', {
     onOpen: () => {
       //startConversation();
     },
     onMessage: (e: any) => {
       _handleSocketMessage(e.data);
+      setConnectStatus(readyState);
 
       const { pingInterval } = parseJson(e.data);
       if (pingInterval > 0) setInterval(() => sendMessage('2'), pingInterval);
@@ -56,6 +72,14 @@ function Chat() {
   }, [userMessage]);
 
   useEffect(() => {
+    let myWelcome = window.electron.store.get('welcome');
+    let myProxy = window.electron.store.get('proxy');
+    if (myWelcome) setWelcomeMessage(myWelcome);
+    if (myProxy) {
+      setProxy(myProxy);
+      setProxyState(1);
+    }
+
     return () => {
       didUnmount.current = true;
     };
@@ -66,7 +90,7 @@ function Chat() {
   };
 
   const startConversation = () => {
-    if (count === 0) return;
+    if (connectStatus === 0) return;
 
     _emitSocketEvent('_sas', {
       channel: 'main',
@@ -303,7 +327,10 @@ function Chat() {
 
       <main>
         <aside>
-          <button onClick={startConversation} disabled={connected}>
+          <button
+            onClick={startConversation}
+            disabled={connected || connectStatus === 0}
+          >
             Połącz
           </button>
           <button onClick={sendDisconnect} disabled={!connected}>
@@ -324,36 +351,102 @@ function Chat() {
             <span>Auto wiadomość powitalna</span>
             <input
               type="text"
+              value={welcomeMessage}
               placeholder="Treść auto wiadomości"
-              onChange={(e) => setWelcomeMessage(e.target.value)}
+              onChange={(e) => {
+                setWelcomeMessage(e.target.value);
+                window.electron.store.set('welcome', e.target.value);
+              }}
             />
           </div>
 
           <div className={connected ? 'connected' : 'infos'}>
             <strong>{info}</strong>
           </div>
+
+          <details>
+            <summary>Proxy</summary>
+            <div>
+              {proxyState === 2 && (
+                <div className="proxyInfo">
+                  Aby korzystać z proxy, uruchom ponownie aplikację.
+                </div>
+              )}
+
+              <small>
+                <div>
+                  <strong>Proszę podać SOCKET5 Proxy.</strong>
+                </div>
+              </small>
+            </div>
+            <input
+              type="text"
+              value={proxy}
+              placeholder="100.100.100.100:8080"
+              onChange={(e) => setProxy(e.target.value)}
+            />
+            <button
+              onClick={() => {
+                window.electron.store.set('proxy', proxy);
+                setProxyState(2);
+              }}
+            >
+              Zapisz
+            </button>
+          </details>
         </aside>
         <div>
           <div className="messages">
-            {captcha.length > 0 && (
-              <div>
-                <p>Captcha</p>
-                <p>
-                  <img src={captcha} alt="captcha" />
-                </p>
+            {proxy && proxyState === 1 && (
+              <div className="proxyMenu">
+                <div>Wykryto ustawienia proxy</div>
+                <div>
+                  Czy chcesz połączyć się z proxy: <strong>{proxy}</strong>
+                  <button
+                    onClick={() => {
+                      window.electron.ipcRenderer.sendMessage(
+                        'proxy',
+                        window.electron.store.get('proxy')
+                      );
+                      setProxyState(0);
+                    }}
+                  >
+                    Połącz z proxy
+                  </button>
+                  <button
+                    onClick={() => {
+                      window.electron.ipcRenderer.sendMessage('proxy', null);
+                      window.electron.store.set('proxy', null);
+                      setProxy(null);
+                      setProxyState(0);
+                    }}
+                  >
+                    Nie korzystaj z proxy
+                  </button>
+                </div>
+              </div>
+            )}
 
-                <p>
+            {captcha.length > 0 && (
+              <div className="captchaMenu">
+                <div>Captcha</div>
+                <div>
+                  <img src={captcha} alt="captcha" />
+                </div>
+
+                <div>
                   <input
                     type="text"
+                    placeholder="Kod z obrazka (7 znaków)"
                     onChange={(e) => setCaptchaText(e.target.value)}
                   />
-                </p>
+                </div>
 
-                <p>
+                <div>
                   <button onClick={() => SolveCaptcha(captchaText)}>
                     Zatwierdź
                   </button>
-                </p>
+                </div>
               </div>
             )}
 

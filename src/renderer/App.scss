@@ -76,3 +76,38 @@ footer {
 .infos {
   color: blue;
 }
+.proxyInfo {
+  color: #f05454;
+  font-weight: bold;
+  background-color: #e8e8e8;
+  padding: 5px;
+  border-radius: 0.5rem;
+}
+.proxyMenu,
+.captchaMenu {
+  display: flex;
+  border: 3px solid #222831;
+  padding: 10px;
+  border-radius: 1rem;
+  div {
+    align-items: center;
+
+    strong {
+      padding: 10px;
+    }
+
+    button,
+    input {
+      margin-top: 10px;
+      width: 50%;
+    }
+    input {
+      padding: 5px;
+    }
+  }
+}
+details {
+  summary {
+    cursor: pointer;
+  }
+}

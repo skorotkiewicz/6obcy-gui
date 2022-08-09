@@ -85,12 +85,14 @@
   "dependencies": {
     "electron-debug": "^3.2.0",
     "electron-log": "^4.4.7",
+    "electron-store": "^8.1.0",
     "electron-updater": "^5.0.3",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-router-dom": "^6.3.0",
     "react-use-websocket": "^4.2.0",
     "scss": "^0.2.4",
+    "socks-proxy-agent": "5.0.0",
     "ws": "^8.8.1"
   },
   "devDependencies": {
