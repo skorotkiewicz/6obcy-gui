@@ -66,6 +66,8 @@ function Chat() {
   };
 
   const startConversation = () => {
+    if (count === 0) return;
+
     _emitSocketEvent('_sas', {
       channel: 'main',
       myself: {
